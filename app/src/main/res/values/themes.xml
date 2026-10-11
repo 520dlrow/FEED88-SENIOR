@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Feed88" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#fafaf7</item>
+        <item name="android:statusBarColor">#fafaf7</item>
+        <item name="android:navigationBarColor">#fafaf7</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
