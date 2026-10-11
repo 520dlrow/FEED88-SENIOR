@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- dark background -->
+    <path android:fillColor="#1a1a1a" android:pathData="M0,0 L108,0 L108,108 L0,108 Z"/>
+    <!-- subtle inner frame -->
+    <path android:strokeColor="#2e2e2e" android:strokeWidth="1" android:fillColor="#00000000"
+        android:pathData="M8,8 L100,8 L100,100 L8,100 Z"/>
+    <!-- RSS waves in orange (senior accent) -->
+    <path android:fillColor="#ff4d00" android:pathData="M30,78 a6,6 0 1,1 12,0 a6,6 0 1,1 -12,0"/>
+    <path android:fillColor="#ff4d00" android:pathData="M28,54 a30,30 0 0,1 30,30 h-11 a19,19 0 0,0 -19,-19 z"/>
+    <path android:fillColor="#ff4d00" android:pathData="M28,32 a52,52 0 0,1 52,52 h-11 a41,41 0 0,0 -41,-41 z"/>
+</vector>
