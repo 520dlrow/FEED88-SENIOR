@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="fr" dir="ltr" data-theme="paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fafaf7" id="tcMeta">
+<meta name="description" content="Feed 88 — votre lecteur de flux RSS. Simple, calme, sans publicité.">
+<meta name="color-scheme" content="light dark">
+<title>Feed 88 — Lecteur</title>
+
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%231a1a1a'/><path fill='%23ff4d00' d='M50,130 a10,10 0 1,1 20,0 a10,10 0 1,1 -20,0'/><path fill='%23ff4d00' d='M46,90 a50,50 0 0,1 50,50 h-18 a32,32 0 0,0 -32,-32 z'/><path fill='%23ff4d00' d='M46,50 a86,86 0 0,1 86,86 h-18 a68,68 0 0,0 -68,-68 z'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --fb:'Fraunces',Georgia,serif;
+  --fu:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --fr:'Newsreader',Georgia,serif;
+  --r:10px;
+  --t:.2s ease;
+}
+
+[data-theme=paper]{--bg:#fafaf7;--bg2:#ffffff;--bg3:#f2f2ec;--bg4:#e8e8e0;--bd:#d8d8ce;--tx:#141414;--tx2:#3a3a32;--tx3:#6a6a60;--ac:#d63a00;--actx:#ffffff;--st:#c88800;--dn:#b02424;--ok:#0a7a3a}
+[data-theme=nuit]{--bg:#131313;--bg2:#1c1c1c;--bg3:#262626;--bg4:#333333;--bd:#3a3a3a;--tx:#f4f4f0;--tx2:#c4c4b8;--tx3:#8a8a80;--ac:#ff8a3d;--actx:#131313;--st:#ffc94d;--dn:#ff7a7a;--ok:#7ee08a}
+[data-theme=sepia]{--bg:#f5ecd8;--bg2:#fbf4e2;--bg3:#ece2c8;--bg4:#dccfad;--bd:#c8b890;--tx:#2a1f10;--tx2:#5a4a2f;--tx3:#7a6a4a;--ac:#a84020;--actx:#fbf4e2;--st:#b8860b;--dn:#a02020;--ok:#3a7020}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100vh;height:100dvh;background:var(--bg);color:var(--tx);font-family:var(--fu);font-size:17px;line-height:1.55;overflow:hidden;overscroll-behavior:none;transition:background .3s,color .3s}
+body{display:flex;flex-direction:column}
+::selection{background:var(--ac);color:var(--actx)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+button,input{font-family:inherit;color:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px;border-radius:6px}
+.rdb,.atitle,.aexc,.rdt,.rdsrc,.ameta{unicode-bidi:plaintext;text-align:start}
+
+header{background:var(--bg2);border-bottom:2px solid var(--bd);display:flex;align-items:center;padding:10px 14px;gap:10px;flex-shrink:0;padding-top:calc(10px + env(safe-area-inset-top));transition:background .3s,border-color .3s}
+.brand{display:flex;align-items:baseline;gap:4px;font-family:var(--fb);font-weight:700;font-size:28px;line-height:1;color:var(--tx);letter-spacing:-.5px;padding:8px 4px;min-height:48px}
+.brand .n{color:var(--ac);font-size:29px;font-style:italic}
+.spacer{flex:1}
+.actions{display:flex;gap:8px;align-items:center}
+.hbtn{width:52px;height:52px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;color:var(--tx);display:grid;place-items:center;padding:0;transition:all var(--t);position:relative}
+.hbtn:hover{border-color:var(--ac)}
+.hbtn:active{transform:scale(.94)}
+.hbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hbtn.spin svg{animation:spin .8s linear infinite}
+.hbtn.on{border-color:var(--ok);color:var(--ok)}
+.hbtn.on svg{fill:currentColor;fill-opacity:.15}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.tabs{display:flex;padding:8px;gap:6px;background:var(--bg2);border-bottom:2px solid var(--bd);flex-shrink:0}
+.tabs button{flex:1;min-height:56px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;font-size:15px;font-weight:600;color:var(--tx2);padding:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all var(--t)}
+.tabs button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.active{background:var(--ac);color:var(--actx);border-color:var(--ac)}
+
+.app{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.sb,.ap,.rd{display:none;flex-direction:column;min-height:0;overflow:hidden}
+.app[data-v=feeds] .sb,.app[data-v=list] .ap,.app[data-v=read] .rd{display:flex}
+@media (min-width:1000px){
+  .tabs{display:none}
+  .app{display:grid;grid-template-columns:280px 400px 1fr}
+  .sb,.ap,.rd{display:flex !important}
+  .sb{border-right:2px solid var(--bd)}
+  .ap{border-right:2px solid var(--bd)}
+}
+
+.sb{background:var(--bg2);transition:background .3s}
+.sbh{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--bd);flex-shrink:0}
+.sbh h2{font-family:var(--fm);font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:2px;font-weight:600}
+.sbh .row{display:flex;gap:6px}
+.sbh button{width:44px;height:44px;border-radius:10px;background:transparent;color:var(--tx3);display:grid;place-items:center;transition:all var(--t)}
+.sbh button:hover{background:var(--bg3);color:var(--ac)}
+.sbh button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.fl{flex:1;overflow-y:auto;padding:8px;-webkit-overflow-scrolling:touch}
+.fi{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;cursor:pointer;position:relative;margin-bottom:4px;min-height:64px;transition:background var(--t)}
+.fi:hover{background:var(--bg3)}
+.fi.active{background:var(--bg3)}
+.fi.active::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:2px;background:var(--ac)}
+.ff{width:38px;height:38px;border-radius:10px;background:var(--bg4);display:grid;place-items:center;font-family:var(--fb);font-size:17px;font-weight:700;color:var(--ac);flex-shrink:0}
+.finfo{flex:1;min-width:0}
+.ftitle{font-size:16px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcount{font-family:var(--fm);font-size:12px;color:var(--tx3);margin-top:2px}
+.fbadge{font-family:var(--fm);font-size:12px;font-weight:700;padding:3px 9px;border-radius:12px;background:var(--ac);color:var(--actx);min-width:26px;text-align:center;flex-shrink:0}
+.fdel{background:transparent;color:var(--tx3);padding:10px;border-radius:8px;flex-shrink:0;opacity:0;transition:opacity var(--t)}
+.fi:hover .fdel{opacity:1}
+@media (hover:none){.fdel{opacity:.55}}
+.fdel:hover{color:var(--dn);background:var(--bg3)}
+.fdel svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
+
+.addf{padding:14px;border-top:2px solid var(--bd);background:var(--bg2);flex-shrink:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.addf.hidden{display:none}
+.addf .hint{font-size:14px;color:var(--tx3);margin-bottom:10px;line-height:1.5}
+.addf input{width:100%;height:56px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:0 14px;outline:none;font-size:16px;margin-bottom:10px;font-family:var(--fm)}
+.addf input:focus{border-color:var(--ac)}
+.addf .r{display:flex;gap:8px}
+.addf button{flex:1;min-height:56px;border-radius:12px;font-size:16px;font-weight:600;border:2px solid var(--bd);background:var(--bg3);transition:all var(--t)}
+.addf button.p{background:var(--ac);color:var(--actx);border-color:var(--ac)}
+.addf button:disabled{opacity:.5}
+.opml{display:flex;gap:8px;padding:10px 14px;border-top:2px solid var(--bd);flex-shrink:0}
+.opml button{flex:1;min-height:52px;font-size:13px;background:transparent;border:2px solid var(--bd);color:var(--tx2);border-radius:10px;font-weight:600;transition:all var(--t)}
+.opml button:hover{border-color:var(--ac);color:var(--ac)}
+.credit{padding:14px;font-family:var(--fm);font-size:11px;color:var(--tx3);border-top:2px solid var(--bd);text-align:center;line-height:1.7;flex-shrink:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.credit a{color:var(--tx3);text-decoration:none;border-bottom:1px dotted var(--tx3)}
+.credit a:hover{color:var(--ac)}
+
+.ap{background:var(--bg);transition:background .3s}
+.ph{padding:14px 18px;border-bottom:2px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.pt{font-family:var(--fb);font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.pc{font-family:var(--fm);font-size:12px;color:var(--tx3);padding:3px 9px;background:var(--bg3);border-radius:12px}
+.fils{margin-left:auto;display:flex;gap:3px;background:var(--bg3);padding:4px;border-radius:10px}
+.fils button{min-height:44px;padding:10px 14px;background:transparent;border:none;border-radius:8px;font-size:14px;font-weight:600;color:var(--tx2);transition:all var(--t)}
+.fils button.active{background:var(--ac);color:var(--actx)}
+.psearch{padding:12px 18px;border-bottom:2px solid var(--bd);position:relative;flex-shrink:0}
+@media (min-width:1000px){.psearch{display:none}}
+.psearch svg{position:absolute;top:50%;left:30px;transform:translateY(-50%);width:20px;height:20px;stroke:var(--tx3);fill:none;stroke-width:2.2;pointer-events:none}
+.psearch input{width:100%;height:56px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:0 14px 0 46px;outline:none;font-size:16px}
+.psearch input:focus{border-color:var(--ac)}
+.ptools{display:flex;gap:8px;padding:10px 18px;border-bottom:2px solid var(--bd);flex-shrink:0}
+.ptools button{min-height:48px;padding:10px 16px;font-size:13px;font-weight:600;background:transparent;border:2px solid var(--bd);border-radius:10px;color:var(--tx2);transition:all var(--t)}
+.ptools button:hover{border-color:var(--ac);color:var(--ac)}
+.al{flex:1;overflow-y:auto;padding:8px;-webkit-overflow-scrolling:touch}
+.ac{padding:18px;border-radius:14px;cursor:pointer;border:2px solid transparent;margin-bottom:6px;transition:all var(--t)}
+.ac:hover{background:var(--bg2)}
+.ac.active{background:var(--bg2);border-color:var(--ac)}
+.ac.read{opacity:.62}
+.ac.read .atitle{font-weight:500}
+.ameta{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:12px;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px;flex-wrap:wrap}
+.ameta .src{color:var(--ac);font-weight:700}
+.ameta .d{width:4px;height:4px;border-radius:50%;background:var(--tx3);opacity:.6}
+.atitle{font-family:var(--fb);font-size:20px;font-weight:700;line-height:1.3;margin-bottom:8px;color:var(--tx);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.aexc{font-size:16px;color:var(--tx2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.athumb{width:100%;height:180px;border-radius:12px;background:var(--bg3);margin-bottom:12px;object-fit:cover;display:block}
+.empty{padding:60px 30px;text-align:center;color:var(--tx3);font-size:17px;line-height:1.7}
+.empty strong{display:block;color:var(--tx2);font-size:22px;margin-bottom:12px;font-family:var(--fb)}
+.empty button{margin-top:20px;padding:16px 30px;min-height:56px;background:var(--ac);color:var(--actx);border:none;border-radius:12px;font-weight:600;font-size:17px;transition:transform var(--t)}
+.empty button:active{transform:scale(.96)}
+
+.rd{background:var(--bg);position:relative;transition:background .3s}
+.rd-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:var(--tx3);padding:30px;text-align:center}
+.rd-empty .lb{font-family:var(--fb);font-size:80px;font-weight:700;color:var(--bg3);line-height:1}
+.rd-empty .lb .a{color:var(--ac);opacity:.4;font-style:italic}
+.rd-empty p{font-size:17px;max-width:300px}
+.rd-c{flex:1;overflow-y:auto;padding:24px 22px 130px;display:none;-webkit-overflow-scrolling:touch}
+.rd-c.on{display:block}
+.rdh{padding-bottom:20px;border-bottom:2px solid var(--bd);margin-bottom:24px}
+.rdsrc{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:13px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;flex-wrap:wrap}
+.rdsrc .sn{color:var(--ac);font-weight:700}
+.rdt{font-family:var(--fb);font-size:30px;font-weight:700;line-height:1.25;letter-spacing:-.4px;margin-bottom:16px;color:var(--tx)}
+.rdb{font-family:var(--fr);line-height:1.85;max-width:760px}
+.rdb img{max-width:100%;height:auto;border-radius:12px;margin:20px 0}
+.rdb p{margin-bottom:1.3em}
+.rdb h1,.rdb h2,.rdb h3,.rdb h4{font-family:var(--fb);font-weight:700;letter-spacing:-.4px;margin:1.6em 0 .7em;line-height:1.3}
+.rdb h2{font-size:1.4em}
+.rdb h3{font-size:1.2em}
+.rdb h4{font-size:1.05em}
+.rdb blockquote{border-left:4px solid var(--ac);padding-left:18px;margin:1.5em 0;font-style:italic;color:var(--tx2)}
+.rdb code{font-family:var(--fm);font-size:.88em;background:var(--bg3);padding:3px 7px;border-radius:5px}
+.rdb pre{background:var(--bg2);border:2px solid var(--bd);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:1.5em 0}
+.rdb pre code{background:none;padding:0;font-size:14px}
+.rdb ul,.rdb ol{margin:1em 0;padding-left:26px}
+.rdb li{margin-bottom:.7em}
+.skel{background:linear-gradient(90deg,var(--bg3) 0%,var(--bg4) 50%,var(--bg3) 100%);background-size:200% 100%;animation:skl 1.4s ease infinite;height:18px;border-radius:6px;margin-bottom:14px}
+.skel.h{height:32px;width:70%;margin-bottom:20px}
+.skel.s{width:50%}
+@keyframes skl{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.fs-float{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom));right:18px;display:none;flex-direction:row;align-items:center;gap:10px;z-index:20}
+.fs-float.on{display:flex}
+.fs-float button{width:58px;height:58px;background:var(--bg2);border:2px solid var(--bd);border-radius:50%;color:var(--tx2);font-size:24px;font-weight:400;font-family:var(--fm);display:grid;place-items:center;line-height:1;padding:0;box-shadow:0 6px 20px rgba(0,0,0,.12);transition:all var(--t)}
+.fs-float button:hover,.fs-float button:focus-visible{border-color:var(--ac);color:var(--ac)}
+.fs-float button:active{transform:scale(.92)}
+.fs-float button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.fs-float button.starred{background:var(--st);border-color:var(--st);color:var(--actx)}
+.fs-float button.starred svg{fill:currentColor}
+@media (min-width:1000px){.fs-float{bottom:40px;right:28px}}
+
+.tst{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(140px);background:var(--bg2);border:2px solid var(--bd);padding:16px 24px;border-radius:14px;font-size:16px;font-weight:500;box-shadow:0 14px 40px rgba(0,0,0,.2);transition:transform .3s;z-index:300;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 32px)}
+.tst.on{transform:translateX(-50%) translateY(0)}
+.tst.err{border-color:var(--dn);color:var(--dn)}
+.tst.ok{border-color:var(--ok);color:var(--ok)}
+.sp{width:18px;height:18px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s}
+.overlay.on{display:flex;opacity:1}
+.panel{background:var(--bg2);border:2px solid var(--bd);border-radius:20px;width:100%;max-width:760px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.4)}
+.panel-h{padding:20px 24px;border-bottom:2px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-shrink:0}
+.panel-title{font-family:var(--fb);font-size:24px;font-weight:700;color:var(--tx)}
+.panel-x{width:52px;height:52px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;display:grid;place-items:center;color:var(--tx2);transition:all var(--t);flex-shrink:0}
+.panel-x:hover{border-color:var(--ac);color:var(--ac)}
+.panel-x svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+.panel-body{flex:1;overflow-y:auto;padding:24px 26px 32px;-webkit-overflow-scrolling:touch;font-size:17px;line-height:1.7;color:var(--tx2)}
+
+.g-sec{margin-bottom:32px}
+.g-sec:last-child{margin-bottom:0}
+.g-sec h2{font-family:var(--fb);font-size:24px;font-weight:700;color:var(--tx);margin-bottom:14px;letter-spacing:-.3px}
+.g-sec p{font-size:17px;color:var(--tx2);margin-bottom:14px;line-height:1.7}
+.g-sec ul{list-style:none;padding:0;margin:14px 0}
+.g-sec li{padding:14px 0;border-bottom:2px solid var(--bd);font-size:16px;line-height:1.6}
+.g-sec li:last-child{border-bottom:0}
+.g-sec li strong{color:var(--tx);font-weight:600}
+.g-sec code{font-family:var(--fm);font-size:.9em;background:var(--bg3);padding:3px 8px;border-radius:6px;color:var(--ac)}
+.g-steps{display:flex;flex-direction:column;gap:18px;margin:18px 0}
+.g-step{display:flex;gap:16px;align-items:flex-start}
+.g-num{flex-shrink:0;width:40px;height:40px;background:var(--ac);color:var(--actx);border-radius:50%;display:grid;place-items:center;font-family:var(--fm);font-weight:700;font-size:17px}
+.g-step > div{flex:1}
+.g-step strong{display:block;font-size:17px;color:var(--tx);margin-bottom:4px;font-weight:600}
+.g-step p{font-size:16px;margin:0}
+.g-notif{display:inline-flex;align-items:center;gap:10px;margin-top:10px;padding:16px 26px;min-height:56px;background:var(--ac);color:var(--actx);border:none;border-radius:12px;font-weight:600;font-size:16px;transition:all var(--t)}
+.g-notif:hover{opacity:.9}
+.g-notif:disabled{opacity:.5}
+.g-footer{background:var(--bg3);border:2px solid var(--bd);border-radius:14px;padding:22px;margin-top:32px;text-align:center}
+.g-footer p{font-size:16px}
+.g-footer a{color:var(--ac);text-decoration:none;font-family:var(--fm);font-size:15px}
+.g-sign{font-family:var(--fr);font-style:italic;color:var(--tx2);margin-top:16px}
+.g-copy{font-family:var(--fm);font-size:12px;color:var(--tx3);margin-top:12px}
+
+.theme-list{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.theme-item{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;cursor:pointer;min-height:64px;transition:all var(--t)}
+.theme-item:hover{border-color:var(--ac)}
+.theme-item.active{border-color:var(--ac);background:var(--bg4)}
+.theme-item .swatch{width:32px;height:32px;border-radius:50%;border:2px solid var(--bd);flex-shrink:0}
+.theme-item span{font-size:17px;font-weight:600;color:var(--tx)}
+.theme-item .check{margin-left:auto;font-size:22px;color:var(--ac);font-weight:700}
+
+.cat-search{padding:14px 24px;border-bottom:2px solid var(--bd);flex-shrink:0}
+.cat-search input{width:100%;height:56px;background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:0 16px;outline:none;font-size:16px}
+.cat-search input:focus{border-color:var(--ac)}
+.cat-summary{padding:16px 4px;font-size:14px;color:var(--tx3);text-align:center;letter-spacing:.3px}
+.cat-summary b{color:var(--ac)}
+.cat-sec{margin-bottom:20px;border:2px solid var(--bd);border-radius:14px;overflow:hidden;background:var(--bg3)}
+.cat-h{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--bg2);border-bottom:2px solid var(--bd);flex-wrap:wrap}
+.cat-icon{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:var(--bg4);flex-shrink:0}
+.cat-name{font-family:var(--fb);font-size:18px;font-weight:700;flex:1;color:var(--tx);min-width:100px}
+.cat-count{font-family:var(--fm);font-size:13px;color:var(--tx3);padding:3px 10px;background:var(--bg4);border-radius:12px;flex-shrink:0}
+.cat-add-all{padding:10px 16px;min-height:48px;font-size:14px;font-weight:600;background:transparent;border:2px solid var(--ac);color:var(--ac);border-radius:10px;transition:all var(--t);flex-shrink:0}
+.cat-add-all:hover:not(:disabled){background:var(--ac);color:var(--actx)}
+.cat-add-all:disabled{opacity:.5;cursor:default}
+.cat-feeds{padding:6px}
+.cat-feed{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;min-height:64px;transition:background .15s}
+.cat-feed:hover{background:var(--bg2)}
+.cat-feed.added{opacity:.55}
+.cat-feed-info{flex:1;min-width:0}
+.cat-feed-info b{display:block;font-size:16px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.cat-feed-info small{font-family:var(--fm);font-size:12px;color:var(--tx3);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
+.cat-add{width:48px;height:48px;border-radius:50%;background:transparent;border:2px solid var(--bd);color:var(--tx2);font-size:24px;font-family:var(--fm);flex-shrink:0;transition:all var(--t);padding:0;display:grid;place-items:center;line-height:1;font-weight:600}
+.cat-add:hover,.cat-add:active{border-color:var(--ac);color:var(--ac)}
+.cat-feed.added .cat-add{background:var(--ac);border-color:var(--ac);color:var(--actx);cursor:default}
+.cat-feed.loading .cat-add{border-color:var(--ac);color:var(--ac);font-size:0;position:relative}
+.cat-feed.loading .cat-add::after{content:'';display:block;width:18px;height:18px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite;position:absolute}
+.cat-feed.failed .cat-add{border-color:var(--dn);color:var(--dn)}
+
+@media (min-width:1000px){.rd-c{padding:32px 56px 130px}.rdt{font-size:36px}}
+@media (max-width:600px){
+  .panel{border-radius:16px;max-height:94vh}
+  .panel-body{padding:20px 20px 28px}
+  .g-sec h2{font-size:21px}
+  .cat-search{padding:10px 16px}
+  .cat-add-all{padding:8px 12px;font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="brand" id="brandBtn" aria-label="Accueil">
+    <span>Feed</span><span class="n">88</span>
+  </button>
+  <div class="spacer"></div>
+  <div class="actions">
+    <button class="hbtn" id="notifBtn" title="Notifications" aria-label="Notifications">
+      <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="hbtn" id="refresh" title="Actualiser" aria-label="Actualiser">
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+    </button>
+    <button class="hbtn" id="guideBtn" title="Aide" aria-label="Aide">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="tabs" id="tabs">
+  <button data-v="feeds">
+    <svg viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.5"/></svg>
+    Flux
+  </button>
+  <button data-v="list" class="active">
+    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+    Articles
+  </button>
+  <button data-v="read">
+    <svg viewBox="0 0 24 24"><path d="M2 4h8a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"/><path d="M22 4h-8a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h9z"/></svg>
+    Lecture
+  </button>
+</div>
+
+<div class="app" data-v="list">
+  <aside class="sb">
+    <div class="sbh">
+      <h2>Mes flux</h2>
+      <div class="row">
+        <button id="catalogBtn" title="Catalogue" aria-label="Ouvrir le catalogue">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </button>
+        <button id="tadd" title="Ajouter un flux" aria-label="Ajouter un flux">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="fl" id="fl"></div>
+    <div class="addf hidden" id="addf">
+      <div class="hint">Collez l'adresse d'un flux RSS. Ou utilisez le catalogue pour choisir parmi des dizaines de journaux.</div>
+      <input type="text" id="furl" placeholder="https://exemple.fr/rss" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Adresse du flux">
+      <div class="r">
+        <button class="p" id="fadd">Ajouter</button>
+        <button id="fcancel">Annuler</button>
+      </div>
+    </div>
+    <div class="opml">
+      <button id="imp">Importer OPML</button>
+      <button id="exp">Sauvegarder</button>
+    </div>
+    <input type="file" id="opmlFile" accept=".opml,.xml" hidden>
+    <div class="credit">
+      © <a href="#">Mohamed</a> · Feed 88
+    </div>
+  </aside>
+
+  <section class="ap">
+    <div class="ph">
+      <div class="pt" id="pt">Tous les articles</div>
+      <div class="pc" id="pc">0</div>
+      <div class="fils" id="fils" role="group" aria-label="Filtrer">
+        <button data-f="all" class="active">Tous</button>
+        <button data-f="unread">Non lus</button>
+        <button data-f="starred">Favoris</button>
+      </div>
+    </div>
+    <div class="psearch">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="q2" placeholder="Rechercher…" autocomplete="off" aria-label="Rechercher un article">
+    </div>
+    <div class="ptools">
+      <button id="markRead">Tout marquer lu</button>
+      <button id="sortBtn">Plus récents</button>
+    </div>
+    <div class="al" id="al"></div>
+  </section>
+
+  <section class="rd">
+    <div class="fs-float" id="fsFloat">
+      <button id="fst" title="Favori" aria-label="Ajouter aux favoris">
+        <svg viewBox="0 0 24 24"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>
+      <button id="fsMinus" title="Texte plus petit" aria-label="Réduire la taille du texte">A−</button>
+      <button id="fsPlus" title="Texte plus grand" aria-label="Agrandir la taille du texte">A+</button>
+    </div>
+    <div class="rd-empty" id="rdEmpty">
+      <div class="lb">Feed<span class="a"> 88</span></div>
+      <p>Choisissez un article dans la liste pour le lire</p>
+    </div>
+    <div class="rd-c" id="rdC"></div>
+  </section>
+</div>
+
+<div class="tst" id="tst" role="status" aria-live="polite"></div>
+
+<div class="overlay" id="guideOverlay">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <header class="panel-h">
+      <div class="panel-title" id="guideTitle">Comment ça marche</div>
+      <button class="panel-x" id="guideClose" aria-label="Fermer">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <div class="panel-body">
+      <section class="g-sec">
+        <h2>Bienvenue</h2>
+        <p>Feed 88 rassemble les articles des journaux que vous avez choisis, dans une seule liste. Pas de publicité, pas de recommandations automatiques, rien à installer.</p>
+        <div class="g-steps">
+          <div class="g-step"><span class="g-num">1</span><div><strong>Choisir des journaux</strong><p>Ouvrez <em>Flux</em>, puis le catalogue. Sélectionnez ceux qui vous intéressent.</p></div></div>
+          <div class="g-step"><span class="g-num">2</span><div><strong>Lire</strong><p>Touchez un article. Le texte s'affiche directement, sans quitter l'application.</p></div></div>
+          <div class="g-step"><span class="g-num">3</span><div><strong>Marquer</strong><p>Touchez l'étoile pour garder un article de côté. Utilisez <em>Non lus</em> pour voir ce qui reste à lire.</p></div></div>
+          <div class="g-step"><span class="g-num">4</span><div><strong>Sauvegarder</strong><p>Le bouton <em>Sauvegarder</em> crée un fichier avec tous vos flux. Conservez-le précieusement.</p></div></div>
+        </div>
+      </section>
+
+      <section class="g-sec">
+        <h2>Notifications</h2>
+        <p>Feed 88 peut vous prévenir lorsque de nouveaux articles arrivent. La permission ne sera demandée qu'une seule fois.</p>
+        <button class="g-notif" id="notifBtn2">Activer les notifications</button>
+      </section>
+
+      <section class="g-sec">
+        <h2>Apparence</h2>
+        <p>Trois thèmes au choix. Le thème clair est le plus reposant en journée.</p>
+        <div class="theme-list" id="themeList"></div>
+      </section>
+
+      <section class="g-sec">
+        <h2>Confidentialité</h2>
+        <p>Vos flux, vos articles lus et vos favoris restent sur votre appareil. Rien n'est envoyé à un serveur qui vous suit.</p>
+        <p>Pour récupérer le texte complet d'un article, l'adresse de cet article est transmise à un service externe. Si cela vous gêne, n'ouvrez que les résumés.</p>
+      </section>
+
+      <section class="g-footer">
+        <p>Une question, une remarque, un problème ?</p>
+        <p style="margin-top:12px"><a href="mailto:mohamed005cheikh@gmail.com">mohamed005cheikh@gmail.com</a></p>
+        <p class="g-sign">— Mohamed</p>
+        <p class="g-copy">Feed 88 · <span id="guideYear"></span></p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="catalogOverlay">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+    <header class="panel-h">
+      <div class="panel-title" id="catTitle">Catalogue</div>
+      <button class="panel-x" id="catalogClose" aria-label="Fermer">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <div class="cat-search">
+      <input type="text" id="catalogSearch" placeholder="Rechercher un journal…" autocomplete="off" aria-label="Rechercher">
+    </div>
+    <div class="panel-body" style="padding:16px 20px 28px">
+      <div class="cat-summary" id="catSummary"></div>
+      <div id="catalogList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const DB_NAME = 'feed88-senior';
+const DB_VER  = 1;
+const LS_KEY  = 'feed88-senior.settings';
+
+const IDB = {
+  db: null,
+  async open(){
+    if (this.db) return this.db;
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(DB_NAME, DB_VER);
+      r.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('articles')){
+          const s = db.createObjectStore('articles', { keyPath: 'id' });
+          s.createIndex('feedId', 'feedId');
+        }
+      };
+      r.onsuccess = () => { this.db = r.result; res(this.db); };
+      r.onerror   = () => rej(r.error);
+    });
+  },
+  async putAll(list){
+    if (!list.length) return;
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('articles', 'readwrite');
+      const s = tx.objectStore('articles');
+      list.forEach(a => s.put(a));
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async getAll(){
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('articles', 'readonly');
+      const req = tx.objectStore('articles').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async clear(){
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('articles', 'readwrite');
+      tx.objectStore('articles').clear();
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async deleteByFeed(feedId){
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('articles', 'readwrite');
+      const idx = tx.objectStore('articles').index('feedId');
+      const req = idx.openCursor(IDBKeyRange.only(feedId));
+      req.onsuccess = e => {
+        const c = e.target.result;
+        if (c){ c.delete(); c.continue(); }
+      };
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+};
+
+const Settings = {
+  read(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; } },
+  write(o){ try { localStorage.setItem(LS_KEY, JSON.stringify(o)); } catch {} },
+};
+
+const $ = id => document.getElementById(id);
+const uid = () => 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function safeHost(u){
+  try { const x = new URL(u); return x.hostname + (x.pathname === '/' ? '' : x.pathname); }
+  catch { return u; }
+}
+
+function formatDate(d){
+  if (!d) return '';
+  const x = new Date(d);
+  if (isNaN(x)) return '';
+  const s = (Date.now() - x) / 1000;
+  if (s < 60) return "à l'instant";
+  if (s < 3600) return 'il y a ' + Math.floor(s / 60) + ' min';
+  if (s < 86400) return 'il y a ' + Math.floor(s / 3600) + ' h';
+  if (s < 604800) return 'il y a ' + Math.floor(s / 86400) + ' j';
+  return x.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function plainText(html){
+  if (!html) return '';
+  return String(html)
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function readTime(html){
+  const w = plainText(html).split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(w / 200)) + ' min';
+}
+
+async function timedFetch(url, ms){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r;
+  } finally { clearTimeout(t); }
+}
+
+const SAFE_TAGS = new Set(['b','i','u','em','strong','p','br','hr','ul','ol','li',
+  'h1','h2','h3','h4','h5','h6','blockquote','pre','code','img','figure','figcaption',
+  'table','thead','tbody','tr','th','td','span','div','sup','sub','small',
+  'article','section','header','footer','aside']);
+const KILL_TAGS = new Set(['script','style','iframe','object','embed','link','meta','form','input','button','svg','math','a']);
+const ALLOWED_ATTRS = { img: ['src','alt','title','loading'], '*': ['class'] };
+
+function sanitize(html){
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(String(html), 'text/html');
+  const clean = el => {
+    const tag = el.tagName.toLowerCase();
+    if (KILL_TAGS.has(tag)){
+      if (tag === 'a'){
+        const parent = el.parentNode;
+        if (parent){
+          while (el.firstChild){
+            const child = el.firstChild;
+            el.removeChild(child);
+            parent.insertBefore(child, el);
+            if (child.nodeType === 1) clean(child);
+          }
+          parent.removeChild(el);
+        }
+      } else { el.remove(); }
+      return;
+    }
+    if (!SAFE_TAGS.has(tag)){
+      const parent = el.parentNode;
+      if (parent){
+        while (el.firstChild){
+          const child = el.firstChild;
+          el.removeChild(child);
+          parent.insertBefore(child, el);
+          if (child.nodeType === 1) clean(child);
+        }
+        parent.removeChild(el);
+      }
+      return;
+    }
+    const allowed = new Set([...(ALLOWED_ATTRS[tag] || []), ...ALLOWED_ATTRS['*']]);
+    for (const at of [...el.attributes]){
+      const n = at.name.toLowerCase();
+      if (!allowed.has(n)){ el.removeAttribute(at.name); continue; }
+      if (n === 'src' && /^\s*(javascript|data|vbscript):/i.test(at.value)){
+        el.removeAttribute(at.name);
+      }
+    }
+    if (tag === 'img' && !el.getAttribute('loading')) el.setAttribute('loading', 'lazy');
+    for (const child of [...el.children]) clean(child);
+  };
+  for (const child of [...doc.body.children]) clean(child);
+  return doc.body.innerHTML;
+}
+
+const THEMES = {
+  paper: { label: 'Clair', color: '#fafaf7' },
+  sepia: { label: 'Sépia', color: '#f5ecd8' },
+  nuit:  { label: 'Nuit',  color: '#131313' },
+};
+const THEME_KEYS = Object.keys(THEMES);
+
+const PROXIES = [ 'https://feed88-proxy.med2026etd.workers.dev' ];
+const FALLBACKS = [
+  { type: 'json', build: u => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(u)}` },
+  { type: 'xml',  build: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
+];
+
+const TIMEOUT = 12000;
+const JINA_TIMEOUT = 20000;
+
+const CATALOG = [
+  { id:'une', name:'À la une', icon:'📰', feeds:[
+    {t:'Le Monde — Une', u:'https://www.lemonde.fr/rss/une.xml'},
+    {t:'Le Figaro — Actualités', u:'https://www.lefigaro.fr/rss/figaro_actualites.xml'},
+    {t:'France Info — Titres', u:'https://www.francetvinfo.fr/titres.rss'},
+    {t:'Courrier International', u:'https://www.courrierinternational.com/feed/all/rss.xml'},
+    {t:'20 Minutes', u:'https://www.20minutes.fr/feeds/rss-une.xml'},
+    {t:'Ouest-France — En continu', u:'https://www.ouest-france.fr/rss-en-continu.xml'},
+  ]},
+  { id:'monde', name:'Monde', icon:'🌍', feeds:[
+    {t:'Le Monde — International', u:'https://www.lemonde.fr/international/rss_full.xml'},
+    {t:'France 24 — Monde', u:'https://www.france24.com/fr/rss'},
+    {t:'RFI — Monde', u:'https://www.rfi.fr/fr/monde/rss'},
+    {t:'Le Figaro — International', u:'https://www.lefigaro.fr/rss/figaro_international.xml'},
+    {t:"L'Express — Monde", u:'https://www.lexpress.fr/rss/monde.xml'},
+    {t:'Libération', u:'https://www.liberation.fr/arc/outboundfeeds/rss/'},
+  ]},
+  { id:'france', name:'France', icon:'🇫🇷', feeds:[
+    {t:'Le Monde — Politique', u:'https://www.lemonde.fr/politique/rss_full.xml'},
+    {t:'France Info — Politique', u:'https://www.francetvinfo.fr/politique/titres.rss'},
+    {t:'Nouvel Obs', u:'https://www.nouvelobs.com/rss.xml'},
+    {t:'Le Point', u:'https://www.lepoint.fr/rss.xml'},
+    {t:"L'Express — À la une", u:'https://www.lexpress.fr/rss/alaune.xml'},
+    {t:'La Croix', u:'https://www.la-croix.com/rss'},
+  ]},
+  { id:'afrique', name:'Afrique', icon:'🌍', feeds:[
+    {t:'Jeune Afrique', u:'https://www.jeuneafrique.com/feed/'},
+    {t:'RFI Afrique', u:'https://www.rfi.fr/fr/afrique/rss'},
+    {t:'Le Monde Afrique', u:'https://www.lemonde.fr/afrique/rss_full.xml'},
+    {t:'France 24 — Afrique', u:'https://www.france24.com/fr/afrique/rss'},
+    {t:'Africanews', u:'https://www.africanews.com/feed/'},
+    {t:'TV5 Monde Afrique', u:'https://information.tv5monde.com/afrique/rss.xml'},
+  ]},
+  { id:'eco', name:'Économie', icon:'📈', feeds:[
+    {t:'Les Échos', u:'https://www.lesechos.fr/rss/rss_actualites.xml'},
+    {t:'Le Monde — Économie', u:'https://www.lemonde.fr/economie/rss_full.xml'},
+    {t:'La Tribune', u:'https://www.latribune.fr/rss/rubriques/a-la-une.rss'},
+    {t:'Le Figaro — Économie', u:'https://www.lefigaro.fr/rss/figaro_economie.xml'},
+    {t:'France Info — Économie', u:'https://www.francetvinfo.fr/economie/titres.rss'},
+  ]},
+  { id:'culture', name:'Culture & Idées', icon:'📚', feeds:[
+    {t:'France Culture', u:'https://www.radiofrance.fr/franceculture/rss'},
+    {t:'Télérama', u:'https://www.telerama.fr/rss/une.xml'},
+    {t:'Les Inrocks', u:'https://www.lesinrocks.com/feed/'},
+    {t:'Le Monde — Culture', u:'https://www.lemonde.fr/culture/rss_full.xml'},
+    {t:'Beaux Arts Magazine', u:'https://www.beauxarts.com/feed/'},
+    {t:'Le Figaro — Culture', u:'https://www.lefigaro.fr/rss/figaro_culture.xml'},
+  ]},
+  { id:'sciences', name:'Santé & Sciences', icon:'🔬', feeds:[
+    {t:'Futura Sciences', u:'https://www.futura-sciences.com/rss/actualites.xml'},
+    {t:'Doctissimo', u:'https://www.doctissimo.fr/rss.xml'},
+    {t:'Santé Magazine', u:'https://www.santemagazine.fr/feed/rss'},
+    {t:'Sciences et Avenir', u:'https://www.sciencesetavenir.fr/rss.xml'},
+    {t:'Le Monde — Sciences', u:'https://www.lemonde.fr/sciences/rss_full.xml'},
+  ]},
+  { id:'sport', name:'Sport', icon:'⚽', feeds:[
+    {t:"L'Équipe", u:'https://www.lequipe.fr/rss/actu_rss.xml'},
+    {t:'Eurosport France', u:'https://www.eurosport.fr/rss.xml'},
+    {t:'RMC Sport', u:'https://rmcsport.bfmtv.com/rss/'},
+    {t:'So Foot', u:'https://www.sofoot.com/rss.xml'},
+    {t:'France Football', u:'https://www.francefootball.fr/rss/actu_rss.xml'},
+  ]},
+  { id:'tech', name:'Technologie', icon:'💻', feeds:[
+    {t:'Numerama', u:'https://www.numerama.com/feed/'},
+    {t:'Journal du Geek', u:'https://www.journaldugeek.com/feed/'},
+    {t:'Les Numériques', u:'https://www.lesnumeriques.com/rss.xml'},
+    {t:'Clubic', u:'https://www.clubic.com/rss/news.xml'},
+    {t:'Next', u:'https://next.ink/feed/'},
+    {t:'01net', u:'https://www.01net.com/feed/'},
+  ]},
+];
+
+const SEED_FEEDS = [
+  { id:'seed-monde', title:'Le Monde',  url:'https://www.lemonde.fr/rss/une.xml',              color:'#1a4d2e' },
+  { id:'seed-fig',   title:'Le Figaro', url:'https://www.lefigaro.fr/rss/figaro_actualites.xml', color:'#1e3a5f' },
+  { id:'seed-f24',   title:'France 24', url:'https://www.france24.com/fr/rss',                  color:'#0d7a6a' },
+];
+
+const state = {
+  feeds: [],
+  articles: [],
+  activeFeedId: null,
+  activeArticleId: null,
+  filter: 'all',
+  search: '',
+  sort: 'newest',
+  theme: 'paper',
+  fontSize: 22,
+  notifications: false,
+};
+
+function persistSettings(){
+  Settings.write({
+    feeds: state.feeds,
+    theme: state.theme,
+    fontSize: state.fontSize,
+    activeFeedId: state.activeFeedId,
+    notifications: state.notifications,
+  });
+}
+
+function slimArticle(a){
+  return {
+    id: a.id, feedId: a.feedId, title: a.title, link: a.link,
+    pubDate: a.pubDate, excerpt: a.excerpt, image: a.image,
+    read: a.read, starred: a.starred, savedAt: a.savedAt,
+    content: (a.content || '').slice(0, 60000),
+    fullContent: a.fullContent ? a.fullContent.slice(0, 180000) : undefined,
+  };
+}
+
+let saveTimer = null;
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    persistSettings();
+    try { await IDB.clear(); await IDB.putAll(state.articles.map(slimArticle)); }
+    catch (e){ console.warn('Sauvegarde échouée', e); }
+  }, 500);
+}
+
+async function loadState(){
+  const s = Settings.read();
+  state.feeds         = Array.isArray(s.feeds) ? s.feeds : [];
+  state.theme         = s.theme || 'paper';
+  state.fontSize      = s.fontSize || 22;
+  state.activeFeedId  = s.activeFeedId || null;
+  state.notifications = !!s.notifications;
+  try { state.articles = await IDB.getAll() || []; }
+  catch { state.articles = []; }
+}
+
+function extractImage(html){
+  if (!html) return null;
+  const m = String(html).match(/<img[^>]+src=["']([^"']+)["']/i);
+  return m ? m[1] : null;
+}
+
+function parseRssXml(text){
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  if (xml.querySelector('parsererror')) throw new Error('Flux illisible');
+  const root = xml.documentElement;
+  const isAtom = root.tagName.toLowerCase() === 'feed';
+  const title = isAtom
+    ? xml.querySelector('feed > title')?.textContent?.trim()
+    : xml.querySelector('channel > title')?.textContent?.trim();
+  const items = [...xml.querySelectorAll(isAtom ? 'entry' : 'item')];
+  const articles = items.slice(0, 40).map(el => {
+    const ttl = el.querySelector('title')?.textContent?.trim() || 'Sans titre';
+    let link = '', date = '', content = '';
+    if (isAtom){
+      const le = el.querySelector('link[rel="alternate"], link');
+      link = le?.getAttribute('href') || '';
+      date = el.querySelector('updated, published')?.textContent || '';
+      content = el.querySelector('content')?.textContent || el.querySelector('summary')?.textContent || '';
+    } else {
+      link = el.querySelector('link')?.textContent?.trim() || '';
+      date = el.querySelector('pubDate')?.textContent || '';
+      content = el.querySelector('content\\:encoded')?.textContent || el.querySelector('description')?.textContent || '';
+    }
+    return {
+      title: ttl, link, pubDate: date,
+      content,
+      excerpt: plainText(content).slice(0, 220),
+      image: el.querySelector('enclosure')?.getAttribute('url') || extractImage(content),
+    };
+  });
+  return { title: title || '', articles };
+}
+
+function parseRss2Json(json){
+  if (json.status !== 'ok') throw new Error(json.message || 'Flux illisible');
+  return {
+    title: json.feed?.title || '',
+    articles: (json.items || []).map(it => ({
+      title: it.title || 'Sans titre',
+      link: it.link || '',
+      pubDate: it.pubDate || '',
+      content: it.content || it.description || '',
+      excerpt: plainText(it.description || it.content).slice(0, 220),
+      image: it.thumbnail || it.enclosure?.link || extractImage(it.content || it.description),
+    })),
+  };
+}
+
+async function fetchFeed(url){
+  const enc = encodeURIComponent(url);
+  const tries = [];
+  for (const base of PROXIES){
+    tries.push(async () => {
+      const r = await timedFetch(`${base}/?url=${enc}`, TIMEOUT);
+      return parseRssXml(await r.text());
+    });
+  }
+  for (const fb of FALLBACKS){
+    if (fb.type === 'json'){
+      tries.push(async () => {
+        const r = await timedFetch(fb.build(url), TIMEOUT);
+        return parseRss2Json(await r.json());
+      });
+    } else {
+      tries.push(async () => {
+        const r = await timedFetch(fb.build(url), TIMEOUT);
+        return parseRssXml(await r.text());
+      });
+    }
+  }
+  let lastErr;
+  for (const fn of tries){
+    try {
+      const res = await fn();
+      if (!res.articles?.length) throw new Error('Aucun article');
+      return res;
+    } catch (e){ lastErr = e; }
+  }
+  throw lastErr || new Error('Impossible de récupérer ce flux');
+}
+
+async function fetchFullArticle(url){
+  const r = await timedFetch(`https://r.jina.ai/${url}`, JINA_TIMEOUT);
+  return await r.text();
+}
+
+function markdownToHtml(md){
+  if (!md) return '';
+  md = md.replace(/^(Title|URL Source|Published Time|Markdown Content):.*$/gm, '').trim();
+  const lines = md.split('\n');
+  let html = '', inCode = false, inList = false, inPara = false;
+  const closePara = () => { if (inPara){ html += '</p>'; inPara = false; } };
+  const closeList = () => { if (inList){ html += '</ul>'; inList = false; } };
+  for (const raw of lines){
+    const line = raw.replace(/\s+$/, '');
+    if (line.startsWith('```')){
+      closePara(); closeList();
+      if (inCode){ html += '</code></pre>'; inCode = false; }
+      else       { html += '<pre><code>'; inCode = true; }
+      continue;
+    }
+    if (inCode){ html += esc(line) + '\n'; continue; }
+    let m;
+    if ((m = line.match(/^(#{1,6})\s+(.+)/))){
+      closePara(); closeList();
+      const lvl = Math.min(m[1].length, 4);
+      html += `<h${lvl}>${inlineMd(m[2])}</h${lvl}>`;
+      continue;
+    }
+    if ((m = line.match(/^[-*+]\s+(.+)/))){
+      closePara();
+      if (!inList){ html += '<ul>'; inList = true; }
+      html += `<li>${inlineMd(m[1])}</li>`;
+      continue;
+    }
+    closeList();
+    if (!line.trim()){ closePara(); continue; }
+    if (!inPara){ html += '<p>'; inPara = true; } else html += ' ';
+    html += inlineMd(line);
+  }
+  closePara(); closeList();
+  if (inCode) html += '</code></pre>';
+  return html;
+}
+
+function inlineMd(text){
+  return esc(text)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, '<img src="$2" alt="$1" loading="lazy">')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, '$1')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+async function addFeed(url){
+  url = (url || '').trim();
+  if (!/^https?:\/\//i.test(url)) throw new Error('Adresse invalide');
+  if (state.feeds.some(f => f.url === url)) throw new Error('Déjà abonné');
+  const { title, articles } = await fetchFeed(url);
+  const id = uid();
+  const feed = {
+    id,
+    title: title || new URL(url).hostname,
+    url,
+    color: `hsl(${Math.floor(Math.random() * 360)} 60% 45%)`,
+  };
+  state.feeds.push(feed);
+  const now = Date.now();
+  articles.forEach((a, i) => {
+    a.id = uid();
+    a.feedId = id;
+    a.read = false;
+    a.starred = false;
+    a.savedAt = now - i;
+  });
+  state.articles = [...articles, ...state.articles];
+  scheduleSave();
+  return { feed, count: articles.length };
+}
+
+function removeFeed(id){
+  state.feeds = state.feeds.filter(f => f.id !== id);
+  state.articles = state.articles.filter(a => a.feedId !== id);
+  if (state.activeFeedId === id) state.activeFeedId = null;
+  IDB.deleteByFeed(id).catch(() => {});
+  scheduleSave();
+  renderAll();
+}
+
+async function refreshAll(){
+  if (!state.feeds.length) return toast('Aucun flux à actualiser', 'err');
+  const btn = $('refresh');
+  btn.disabled = true;
+  btn.classList.add('spin');
+  toast('Actualisation…', 'loading');
+  let added = 0, failed = 0;
+  const results = await Promise.allSettled(state.feeds.map(async f => {
+    const { articles } = await fetchFeed(f.url);
+    const known = new Set(state.articles.filter(a => a.feedId === f.id).map(a => a.link));
+    const fresh = articles.filter(a => a.link && !known.has(a.link));
+    const now = Date.now();
+    fresh.forEach((a, i) => {
+      a.id = uid();
+      a.feedId = f.id;
+      a.read = false;
+      a.starred = false;
+      a.savedAt = now - i;
+    });
+    state.articles = [...fresh, ...state.articles];
+    return fresh.length;
+  }));
+  results.forEach(r => r.status === 'fulfilled' ? added += r.value : failed++);
+  scheduleSave();
+  renderAll();
+  btn.disabled = false;
+  btn.classList.remove('spin');
+  const msg = added > 0
+    ? `${added} nouvel${added > 1 ? 's' : ''} article${added > 1 ? 's' : ''}`
+    : (failed ? 'Actualisation partielle' : 'Rien de nouveau');
+  toast(msg, added ? 'ok' : '');
+  if (added > 0) notify('Feed 88', `${added} nouvel${added > 1 ? 's' : ''} article${added > 1 ? 's' : ''}`);
+}
+
+function renderAll(){ renderFeeds(); renderList(); }
+
+function renderFeeds(){
+  const unread = state.articles.filter(a => !a.read).length;
+  let html = `<div class="fi ${state.activeFeedId === null ? 'active' : ''}" data-f="all">
+    <div class="ff" style="background:var(--ac);color:var(--actx)">∞</div>
+    <div class="finfo">
+      <div class="ftitle">Tous les articles</div>
+      <div class="fcount">${state.feeds.length} flux</div>
+    </div>
+    ${unread > 0 ? `<div class="fbadge">${unread}</div>` : ''}
+  </div>`;
+  state.feeds.forEach(f => {
+    const arts = state.articles.filter(a => a.feedId === f.id);
+    const u = arts.filter(a => !a.read).length;
+    const initial = (f.title[0] || '?').toUpperCase();
+    html += `<div class="fi ${state.activeFeedId === f.id ? 'active' : ''}" data-f="${f.id}">
+      <div class="ff" style="background:${f.color}22;color:${f.color}">${esc(initial)}</div>
+      <div class="finfo">
+        <div class="ftitle">${esc(f.title)}</div>
+        <div class="fcount">${arts.length} article${arts.length !== 1 ? 's' : ''}</div>
+      </div>
+      ${u > 0 ? `<div class="fbadge">${u}</div>` : ''}
+      <button class="fdel" data-del="${f.id}" aria-label="Supprimer ce flux">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      </button>
+    </div>`;
+  });
+  const fl = $('fl');
+  fl.innerHTML = html;
+  fl.querySelectorAll('.fi').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('[data-del]')) return;
+      state.activeFeedId = el.dataset.f === 'all' ? null : el.dataset.f;
+      persistSettings();
+      renderFeeds();
+      renderList();
+      switchTo('list');
+    });
+  });
+  fl.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (confirm('Supprimer ce flux et tous ses articles ?')) removeFeed(btn.dataset.del);
+    });
+  });
+}
+
+function filteredArticles(){
+  let l = [...state.articles];
+  if (state.activeFeedId) l = l.filter(a => a.feedId === state.activeFeedId);
+  if (state.filter === 'unread')  l = l.filter(a => !a.read);
+  if (state.filter === 'starred') l = l.filter(a => a.starred);
+  const q = state.search.trim().toLowerCase();
+  if (q){
+    l = l.filter(a =>
+      (a.title || '').toLowerCase().includes(q) ||
+      (a.excerpt || '').toLowerCase().includes(q)
+    );
+  }
+  l.sort((a, b) => {
+    const d1 = new Date(a.pubDate || a.savedAt);
+    const d2 = new Date(b.pubDate || b.savedAt);
+    return state.sort === 'newest' ? d2 - d1 : d1 - d2;
+  });
+  return l;
+}
+
+function renderList(){
+  const list = filteredArticles();
+  const feed = state.activeFeedId ? state.feeds.find(x => x.id === state.activeFeedId) : null;
+  $('pt').textContent = feed ? feed.title : (state.search ? 'Recherche' : 'Tous les articles');
+  $('pc').textContent = list.length;
+  if (!list.length){
+    const msg = state.search ? 'Aucun article ne correspond.'
+              : state.filter !== 'all' ? 'Rien dans cette catégorie.'
+              : 'Ajoutez des flux pour commencer.';
+    $('al').innerHTML = `<div class="empty">
+      <strong>Vide</strong>${msg}
+      ${!state.feeds.length ? '<button id="seedBtn">Charger des exemples</button>' : ''}
+    </div>`;
+    const sb = $('seedBtn');
+    if (sb) sb.addEventListener('click', seedDemo);
+    return;
+  }
+  $('al').innerHTML = list.map(a => {
+    const f = state.feeds.find(x => x.id === a.feedId);
+    const star = a.starred ? '<span class="d"></span><span style="color:var(--st)">★</span>' : '';
+    return `<article class="ac ${a.read ? 'read' : ''} ${a.id === state.activeArticleId ? 'active' : ''}" data-id="${a.id}">
+      ${a.image ? `<img class="athumb" src="${esc(a.image)}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+      <div class="ameta">
+        <span class="src">${esc(f?.title || 'Flux')}</span>
+        <span class="d"></span><span>${formatDate(a.pubDate)}</span>${star}
+      </div>
+      <h3 class="atitle">${esc(a.title)}</h3>
+      <p class="aexc">${esc(a.excerpt)}</p>
+    </article>`;
+  }).join('');
+  $('al').querySelectorAll('.ac').forEach(el => {
+    el.addEventListener('click', () => openArticle(el.dataset.id));
+  });
+}
+
+async function openArticle(id){
+  const a = state.articles.find(x => x.id === id);
+  if (!a) return;
+  a.read = true;
+  state.activeArticleId = id;
+  const f = state.feeds.find(x => x.id === a.feedId);
+  $('rdEmpty').style.display = 'none';
+  const body = $('rdC');
+  body.classList.add('on');
+  const text = plainText(a.content || a.excerpt);
+  const isShort = text.length < 400;
+  const hasFull = a.fullContent && a.fullContent.length > text.length;
+  renderReader(a, f, hasFull ? a.fullContent : a.content, isShort && !hasFull);
+  body.scrollTop = 0;
+  updateFloat();
+  scheduleSave();
+  renderList();
+  renderFeeds();
+  switchTo('read');
+  if (isShort && !hasFull && a.link) fetchArticleInBackground(a);
+}
+
+function renderReader(a, f, bodyHtml, silentLoading){
+  const safeBody = sanitize(bodyHtml || '');
+  const sourceLine = `<span class="sn">${esc(f?.title || 'Flux')}</span><span>·</span><span>${formatDate(a.pubDate)}</span><span>·</span><span>${readTime(safeBody)}</span>`;
+  $('rdC').innerHTML = `
+    <header class="rdh">
+      <div class="rdsrc">${sourceLine}</div>
+      <h1 class="rdt">${esc(a.title)}</h1>
+    </header>
+    <div id="rbody"></div>`;
+  const rbody = $('rbody');
+  if (silentLoading){
+    rbody.innerHTML = `
+      <div class="rdb" style="font-size:${state.fontSize}px">
+        ${safeBody || '<p>' + esc(a.excerpt) + '</p>'}
+        <div style="margin-top:36px">
+          <div class="skel h"></div>
+          <div class="skel"></div>
+          <div class="skel"></div>
+          <div class="skel s"></div>
+          <div class="skel"></div>
+          <div class="skel s"></div>
+        </div>
+      </div>`;
+  } else {
+    rbody.innerHTML = `<div class="rdb" style="font-size:${state.fontSize}px">${safeBody || '<p>' + esc(a.excerpt) + '</p>'}</div>`;
+  }
+  $('fst').classList.toggle('starred', !!a.starred);
+}
+
+function updateFloat(){ $('fsFloat').classList.toggle('on', !!state.activeArticleId); }
+
+const fetching = new Set();
+async function fetchArticleInBackground(a){
+  if (fetching.has(a.id)) return;
+  fetching.add(a.id);
+  try {
+    const md = await fetchFullArticle(a.link);
+    const html = sanitize(markdownToHtml(md));
+    if (!html || html.length < 200) throw new Error('vide');
+    a.fullContent = html;
+    scheduleSave();
+    if (state.activeArticleId === a.id){
+      const f = state.feeds.find(x => x.id === a.feedId);
+      renderReader(a, f, html, false);
+    }
+  } catch (e){
+    console.warn('Article complet indisponible', a.link);
+    if (state.activeArticleId === a.id){
+      const rbody = document.querySelector('.rdb');
+      if (rbody) rbody.innerHTML = sanitize(a.content) || '<p>' + esc(a.excerpt) + '</p>';
+    }
+  } finally { fetching.delete(a.id); }
+}
+
+function setFontSize(px){
+  state.fontSize = Math.max(16, Math.min(32, px));
+  const body = document.querySelector('.rdb');
+  if (body) body.style.fontSize = state.fontSize + 'px';
+  persistSettings();
+  toast(`Texte : ${state.fontSize}`, 'ok', 1000);
+}
+
+function switchTo(view){
+  document.querySelector('.app').dataset.v = view;
+  document.querySelectorAll('.tabs button').forEach(b => {
+    b.classList.toggle('active', b.dataset.v === view);
+  });
+  updateFloat();
+}
+
+async function seedDemo(){
+  if (!state.feeds.length){
+    state.feeds = [...SEED_FEEDS];
+    persistSettings();
+    renderFeeds();
+  }
+  toast('Chargement des articles…', 'loading');
+  let ok = 0;
+  for (const f of SEED_FEEDS){
+    try {
+      const { articles } = await fetchFeed(f.url);
+      const fresh = articles.slice(0, 20);
+      const now = Date.now();
+      fresh.forEach((a, i) => {
+        a.id = uid();
+        a.feedId = f.id;
+        a.read = false;
+        a.starred = false;
+        a.savedAt = now - i;
+      });
+      state.articles = [...fresh, ...state.articles];
+      ok++;
+      scheduleSave();
+      renderAll();
+    } catch (e){ /* flux mort */ }
+  }
+  toast(ok ? `${ok} flux chargé${ok > 1 ? 's' : ''}` : 'Impossible de charger les exemples', ok ? 'ok' : 'err');
+}
+
+let catalogBuilt = false;
+
+function buildCatalog(){
+  const el = $('catalogList');
+  el.innerHTML = CATALOG.map(cat => {
+    const rows = cat.feeds.map(x => {
+      const added = state.feeds.some(sf => sf.url === x.u);
+      return `<div class="cat-feed ${added ? 'added' : ''}" data-url="${esc(x.u)}" data-cat="${cat.id}">
+        <div class="cat-feed-info">
+          <b>${esc(x.t)}</b>
+          <small>${esc(safeHost(x.u))}</small>
+        </div>
+        <button class="cat-add" aria-label="${added ? 'Déjà ajouté' : 'Ajouter ce flux'}">${added ? '✓' : '+'}</button>
+      </div>`;
+    }).join('');
+    const addedCount = cat.feeds.filter(x => state.feeds.some(sf => sf.url === x.u)).length;
+    const allDone = addedCount === cat.feeds.length;
+    return `<section class="cat-sec" data-cat="${cat.id}">
+      <header class="cat-h">
+        <div class="cat-icon" aria-hidden="true">${cat.icon}</div>
+        <div class="cat-name">${esc(cat.name)}</div>
+        <div class="cat-count">${addedCount}/${cat.feeds.length}</div>
+        <button class="cat-add-all" data-cat="${cat.id}" ${allDone ? 'disabled' : ''}>${allDone ? 'Tout ajouté' : 'Tout ajouter'}</button>
+      </header>
+      <div class="cat-feeds">${rows}</div>
+    </section>`;
+  }).join('');
+  el.querySelectorAll('.cat-feed').forEach(row => {
+    row.querySelector('.cat-add').addEventListener('click', e => {
+      e.stopPropagation();
+      if (row.classList.contains('added') || row.classList.contains('loading')) return;
+      addOneFeed(row);
+    });
+  });
+  el.querySelectorAll('.cat-add-all').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const cat = CATALOG.find(c => c.id === btn.dataset.cat);
+      if (cat) addWholeCategory(cat, btn);
+    });
+  });
+  catalogBuilt = true;
+  updateCatalogSummary();
+}
+
+function filterCatalog(term){
+  const q = (term || '').trim().toLowerCase();
+  let visible = 0;
+  $('catalogList').querySelectorAll('.cat-sec').forEach(sec => {
+    let shown = 0;
+    sec.querySelectorAll('.cat-feed').forEach(row => {
+      const title = row.querySelector('b').textContent.toLowerCase();
+      const url = row.dataset.url.toLowerCase();
+      const match = !q || title.includes(q) || url.includes(q);
+      row.style.display = match ? '' : 'none';
+      if (match) shown++;
+    });
+    sec.style.display = shown ? '' : 'none';
+    visible += shown;
+  });
+  updateCatalogSummary(visible);
+}
+
+function updateCatalogSummary(visible){
+  const all = CATALOG.flatMap(c => c.feeds);
+  const added = all.filter(x => state.feeds.some(sf => sf.url === x.u)).length;
+  const total = all.length;
+  const shown = visible === undefined ? total : visible;
+  $('catSummary').innerHTML = `<b>${added}</b> journal${added > 1 ? 'x' : ''} sur <b>${total}</b>${shown !== total ? ` · <b>${shown}</b> affiché${shown > 1 ? 's' : ''}` : ''}`;
+}
+
+function updateCategoryCounters(catId){
+  const cat = CATALOG.find(c => c.id === catId);
+  if (!cat) return;
+  const sec = $('catalogList').querySelector(`.cat-sec[data-cat="${catId}"]`);
+  if (!sec) return;
+  const added = cat.feeds.filter(x => state.feeds.some(sf => sf.url === x.u)).length;
+  sec.querySelector('.cat-count').textContent = `${added}/${cat.feeds.length}`;
+  const btn = sec.querySelector('.cat-add-all');
+  if (added === cat.feeds.length){ btn.disabled = true; btn.textContent = 'Tout ajouté'; }
+}
+
+async function addOneFeed(row){
+  const url = row.dataset.url;
+  row.classList.add('loading');
+  try {
+    await addFeed(url);
+    row.classList.remove('loading');
+    row.classList.add('added');
+    row.querySelector('.cat-add').textContent = '✓';
+    renderAll();
+    updateCatalogSummary();
+    updateCategoryCounters(row.dataset.cat);
+    const feed = state.feeds.find(f => f.url === url);
+    toast(`${feed?.title || 'Flux'} ajouté`, 'ok', 1600);
+  } catch (e){
+    row.classList.remove('loading');
+    row.classList.add('failed');
+    row.querySelector('.cat-add').textContent = '×';
+    setTimeout(() => {
+      row.classList.remove('failed');
+      row.querySelector('.cat-add').textContent = '+';
+    }, 2000);
+    toast('Impossible d\'ajouter ce flux', 'err', 3000);
+  }
+}
+
+async function addWholeCategory(cat, btn){
+  const q = ($('catalogSearch').value || '').trim().toLowerCase();
+  const visible = cat.feeds.filter(x => !q || x.t.toLowerCase().includes(q) || x.u.toLowerCase().includes(q));
+  const pending = visible.filter(x => !state.feeds.some(sf => sf.url === x.u));
+  if (!pending.length) return;
+  const original = btn.textContent;
+  btn.disabled = true;
+  let ok = 0, fail = 0;
+  for (const f of pending){
+    btn.textContent = `${ok + fail + 1}/${pending.length}`;
+    try {
+      await addFeed(f.u);
+      ok++;
+      const row = $('catalogList').querySelector(`.cat-feed[data-url="${CSS.escape(f.u)}"]`);
+      if (row){ row.classList.add('added'); row.querySelector('.cat-add').textContent = '✓'; }
+      renderAll();
+      updateCategoryCounters(cat.id);
+    } catch { fail++; }
+  }
+  btn.textContent = fail ? `${ok} ok · ${fail} échec` : 'Terminé ✓';
+  updateCatalogSummary();
+  toast(`${ok} flux ajouté${ok > 1 ? 's' : ''}${fail ? ` · ${fail} échec${fail > 1 ? 's' : ''}` : ''}`, ok ? 'ok' : 'err', 2500);
+  if (ok > 0) notify('Feed 88', `${ok} flux ajouté${ok > 1 ? 's' : ''}`);
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = original;
+    updateCategoryCounters(cat.id);
+  }, 2400);
+}
+
+function exportOpml(){
+  if (!state.feeds.length) return toast('Aucun flux à sauvegarder', 'err');
+  const lines = state.feeds.map(f =>
+    `    <outline type="rss" text="${esc(f.title)}" title="${esc(f.title)}" xmlUrl="${esc(f.url)}"/>`
+  ).join('\n');
+  const opml = `<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0"><head><title>Feed 88</title></head><body>\n${lines}\n</body></opml>`;
+
+  if (window.AndroidBridge?.exportOpml){
+    try { window.AndroidBridge.exportOpml('feed88-sauvegarde.opml', opml); return; }
+    catch {}
+  }
+
+  try {
+    const blob = new Blob([opml], { type: 'text/xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'feed88-sauvegarde.opml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Fichier enregistré', 'ok');
+  } catch { toast('Sauvegarde impossible', 'err'); }
+}
+
+async function importOpml(file){
+  const text = await file.text();
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  const outlines = [...xml.querySelectorAll('outline[xmlUrl]')];
+  if (!outlines.length) return toast('Aucun flux dans ce fichier', 'err');
+  toast(`Importation de ${outlines.length} flux…`, 'loading');
+  let ok = 0, fail = 0;
+  for (const o of outlines){
+    try { await addFeed(o.getAttribute('xmlUrl')); ok++; }
+    catch { fail++; }
+  }
+  scheduleSave();
+  renderAll();
+  toast(`${ok} importé${ok > 1 ? 's' : ''}${fail ? ` · ${fail} échec${fail > 1 ? 's' : ''}` : ''}`, ok ? 'ok' : 'err');
+}
+
+function updateNotifUI(){
+  const btn = $('notifBtn');
+  if (!('Notification' in window) && !window.AndroidBridge?.notify){
+    btn.style.display = 'none';
+    return;
+  }
+  if ('Notification' in window && Notification.permission === 'granted'){
+    btn.classList.add('on');
+    btn.title = 'Notifications activées';
+  } else {
+    btn.classList.remove('on');
+    btn.title = 'Activer les notifications';
+  }
+}
+
+async function requestNotifications(){
+  if (window.AndroidBridge?.notify){
+    try {
+      window.AndroidBridge.notify('Feed 88', 'Les notifications sont activées.');
+      state.notifications = true;
+      persistSettings();
+      updateNotifUI();
+      updateNotifBtnInGuide();
+      toast('Notifications activées', 'ok');
+      return;
+    } catch {}
+  }
+  if (!('Notification' in window)){
+    toast('Non disponible sur ce navigateur', 'err');
+    return;
+  }
+  if (Notification.permission === 'granted'){
+    toast('Notifications déjà activées', 'ok');
+    return;
+  }
+  try {
+    const p = await Notification.requestPermission();
+    state.notifications = (p === 'granted');
+    persistSettings();
+    updateNotifUI();
+    updateNotifBtnInGuide();
+    toast(p === 'granted' ? 'Notifications activées' : 'Notifications refusées', p === 'granted' ? 'ok' : 'err');
+  } catch { toast('Impossible d\'activer les notifications', 'err'); }
+}
+
+function updateNotifBtnInGuide(){
+  const btn = $('notifBtn2');
+  if (!btn) return;
+  if (!('Notification' in window) && !window.AndroidBridge?.notify){
+    btn.textContent = 'Non disponible sur ce navigateur';
+    btn.disabled = true;
+    return;
+  }
+  if ((('Notification' in window) && Notification.permission === 'granted') || state.notifications){
+    btn.textContent = 'Notifications activées ✓';
+    btn.disabled = true;
+  }
+}
+
+function notify(title, body){
+  if (window.AndroidBridge?.notify){
+    try { window.AndroidBridge.notify(title, body); return; } catch {}
+  }
+  if ('Notification' in window && Notification.permission === 'granted'){
+    try {
+      new Notification(title, {
+        body,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%231a1a1a"/><text x="50" y="68" font-family="Georgia" font-size="46" font-weight="700" text-anchor="middle" fill="%23ff4d00">F8</text></svg>',
+        silent: false,
+      });
+    } catch {}
+  }
+}
+
+let toastTimer;
+function toast(msg, kind = '', ms = 2600){
+  const el = $('tst');
+  el.className = 'tst ' + (kind === 'err' ? 'err' : kind === 'ok' ? 'ok' : '');
+  el.innerHTML = (kind === 'loading' ? '<div class="sp"></div>' : '') + esc(msg);
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  if (kind !== 'loading') toastTimer = setTimeout(() => el.classList.remove('on'), ms);
+}
+
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function trapFocus(container, e){
+  if (e.key !== 'Tab') return;
+  const items = [...container.querySelectorAll(FOCUSABLE)]
+    .filter(el => el.offsetParent !== null || el === document.activeElement);
+  if (!items.length) return;
+  const first = items[0], last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
+
+let lastFocus = null;
+
+function openOverlay(id){
+  lastFocus = document.activeElement;
+  $(id).classList.add('on');
+  setTimeout(() => {
+    const first = $(id).querySelector(FOCUSABLE);
+    if (first) first.focus();
+  }, 60);
+}
+function closeOverlay(id){
+  $(id).classList.remove('on');
+  lastFocus?.focus?.();
+}
+function anyOverlayOpen(){
+  return $('guideOverlay').classList.contains('on') || $('catalogOverlay').classList.contains('on');
+}
+
+function buildThemeList(){
+  const el = $('themeList');
+  el.innerHTML = THEME_KEYS.map(k => `
+    <div class="theme-item ${state.theme === k ? 'active' : ''}" data-theme="${k}">
+      <div class="swatch" style="background:${THEMES[k].color}"></div>
+      <span>${THEMES[k].label}</span>
+      ${state.theme === k ? '<span class="check">✓</span>' : ''}
+    </div>
+  `).join('');
+  el.querySelectorAll('.theme-item').forEach(item => {
+    item.addEventListener('click', () => {
+      applyTheme(item.dataset.theme);
+      buildThemeList();
+      toast(`Thème : ${THEMES[item.dataset.theme].label}`, 'ok', 1200);
+    });
+  });
+}
+
+function applyTheme(name){
+  if (!THEMES[name]) return;
+  state.theme = name;
+  document.documentElement.setAttribute('data-theme', name);
+  const m = $('tcMeta');
+  if (m) m.content = THEMES[name].color;
+  persistSettings();
+}
+
+function bindUI(){
+  $('brandBtn').addEventListener('click', () => switchTo('list'));
+  $('refresh').addEventListener('click', refreshAll);
+  $('notifBtn').addEventListener('click', requestNotifications);
+  $('notifBtn2')?.addEventListener('click', requestNotifications);
+
+  $('guideBtn').addEventListener('click', () => {
+    updateNotifBtnInGuide();
+    buildThemeList();
+    openOverlay('guideOverlay');
+  });
+  $('guideClose').addEventListener('click', () => closeOverlay('guideOverlay'));
+  $('guideOverlay').addEventListener('click', e => {
+    if (e.target.id === 'guideOverlay') closeOverlay('guideOverlay');
+  });
+
+  $('catalogBtn').addEventListener('click', () => {
+    if (!catalogBuilt) buildCatalog();
+    filterCatalog('');
+    $('catalogSearch').value = '';
+    openOverlay('catalogOverlay');
+  });
+  $('catalogClose').addEventListener('click', () => closeOverlay('catalogOverlay'));
+  $('catalogOverlay').addEventListener('click', e => {
+    if (e.target.id === 'catalogOverlay') closeOverlay('catalogOverlay');
+  });
+
+  let catTimer;
+  $('catalogSearch').addEventListener('input', e => {
+    clearTimeout(catTimer);
+    catTimer = setTimeout(() => filterCatalog(e.target.value), 120);
+  });
+
+  $('tabs').addEventListener('click', e => {
+    const b = e.target.closest('button[data-v]');
+    if (b) switchTo(b.dataset.v);
+  });
+
+  $('fils').addEventListener('click', e => {
+    const b = e.target.closest('button[data-f]');
+    if (!b) return;
+    state.filter = b.dataset.f;
+    document.querySelectorAll('#fils button').forEach(x =>
+      x.classList.toggle('active', x.dataset.f === state.filter)
+    );
+    renderList();
+  });
+
+  $('sortBtn').addEventListener('click', () => {
+    state.sort = state.sort === 'newest' ? 'oldest' : 'newest';
+    $('sortBtn').textContent = state.sort === 'newest' ? 'Plus récents' : 'Plus anciens';
+    renderList();
+  });
+
+  $('markRead').addEventListener('click', () => {
+    const list = filteredArticles();
+    list.forEach(a => a.read = true);
+    scheduleSave();
+    renderAll();
+    toast(`${list.length} article${list.length > 1 ? 's' : ''} marqué${list.length > 1 ? 's' : ''} comme lu${list.length > 1 ? 's' : ''}`, 'ok', 1800);
+  });
+
+  let searchTimer;
+  const applySearch = v => {
+    state.search = v;
+    $('q2').value = v;
+    renderList();
+  };
+  $('q2').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => applySearch(e.target.value), 200);
+  });
+
+  $('tadd').addEventListener('click', () => {
+    const panel = $('addf');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) setTimeout(() => $('furl').focus(), 60);
+  });
+  $('fcancel').addEventListener('click', () => {
+    $('addf').classList.add('hidden');
+    $('furl').value = '';
+  });
+  $('fadd').addEventListener('click', async () => {
+    const url = $('furl').value.trim();
+    if (!url) return;
+    const btn = $('fadd');
+    btn.disabled = true;
+    btn.textContent = '…';
+    try {
+      const { feed, count } = await addFeed(url);
+      toast(`${feed.title} — ${count} articles`, 'ok', 2200);
+      $('furl').value = '';
+      $('addf').classList.add('hidden');
+      renderAll();
+    } catch (e){
+      toast(e.message || 'Impossible d\'ajouter ce flux', 'err', 3500);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Ajouter';
+    }
+  });
+  $('furl').addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('fadd').click();
+  });
+
+  $('imp').addEventListener('click', () => $('opmlFile').click());
+  $('opmlFile').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) importOpml(f);
+    e.target.value = '';
+  });
+  $('exp').addEventListener('click', exportOpml);
+
+  $('fst').addEventListener('click', () => {
+    const a = state.articles.find(x => x.id === state.activeArticleId);
+    if (!a) return;
+    a.starred = !a.starred;
+    $('fst').classList.toggle('starred', a.starred);
+    scheduleSave();
+    renderList();
+    toast(a.starred ? 'Ajouté aux favoris' : 'Retiré des favoris', 'ok', 1200);
+  });
+  $('fsMinus').addEventListener('click', () => setFontSize(state.fontSize - 2));
+  $('fsPlus').addEventListener('click', () => setFontSize(state.fontSize + 2));
+}
+
+function isEditing(el){
+  if (!el) return false;
+  const t = (el.tagName || '').toLowerCase();
+  return t === 'input' || t === 'textarea' || t === 'select' || el.isContentEditable;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    if (anyOverlayOpen()){
+      if ($('guideOverlay').classList.contains('on')) closeOverlay('guideOverlay');
+      else closeOverlay('catalogOverlay');
+      return;
+    }
+    return;
+  }
+  const guideOpen = $('guideOverlay').classList.contains('on');
+  const catalogOpen = $('catalogOverlay').classList.contains('on');
+  if (e.key === 'Tab'){
+    if (guideOpen) trapFocus($('guideOverlay').querySelector('.panel'), e);
+    else if (catalogOpen) trapFocus($('catalogOverlay').querySelector('.panel'), e);
+    return;
+  }
+  if (guideOpen || catalogOpen) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (isEditing(e.target)) return;
+  const k = e.key.toLowerCase();
+  if (k === 'r'){ e.preventDefault(); refreshAll(); }
+  else if (k === 'j'){ e.preventDefault(); setFontSize(state.fontSize - 2); }
+  else if (k === 'k'){ e.preventDefault(); setFontSize(state.fontSize + 2); }
+  else if (k === 'a'){ e.preventDefault(); $('guideBtn').click(); }
+});
+
+(async function init(){
+  try { await IDB.open(); }
+  catch (e){ console.warn('IndexedDB indisponible'); }
+  await loadState();
+  applyTheme(state.theme);
+  updateNotifUI();
+  $('sortBtn').textContent = state.sort === 'newest' ? 'Plus récents' : 'Plus anciens';
+  bindUI();
+  renderAll();
+  updateFloat();
+  $('guideYear').textContent = new Date().getFullYear();
+  if (!state.feeds.length && !state.articles.length){
+    setTimeout(seedDemo, 300);
+  }
+})();
+
+})();
+</script>
+</body>
+        </html>
